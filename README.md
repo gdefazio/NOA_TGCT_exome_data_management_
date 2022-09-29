@@ -1,5 +1,72 @@
 # SNP_INDEL_filtering
 
+This program executes all the passages contained in the Krausz et al. pipeline for SNP and 
+INDEL filtering. It takes in input .xlsx or .csv files obtained after exome sequencing data
+analysis and is aimed to find the rarest variants.
+
+### USAGE 
+
+```
+SNP_indel_filter_PV.py [-h] (-s SINGLE | -d DIRECTORY) 
+                       [-p PARALLEL] [-a AUX1] [-b AUX2] [-o OUTPUT]
+
+```
+Indicate a single file or a directory containing multiple files.
+
+options:
+
+  -h, --help            show this help message and exit
+  -s SINGLE, --single SINGLE
+                        Path to a single INDEL or SNP file. 
+  -d DIRECTORY, --directory DIRECTORY
+                        Path to directory to elaborate
+  -p PARALLEL, --parallel PARALLEL
+                        Multiprocessing: Parallel degree number (default 2) unused in single mode
+  -a AUX1, --aux1 AUX1  
+	           Auxiliary data sheet containing SAMPLE as sample name and PHENOTYPE as 			           diagnosis or ethnic labels column. It is a CSV file format.
+                        E.g.
+	           SAMPLE,PHENOTYPE
+	           A731RV,AZO
+	           B732RV,AZO
+	           C733RV,CRTL
+  -b AUX2, --aux2 AUX2  Auxiliary directory containing OMIM genes classification (e.g. D/r).
+  -o OUTPUT, --output OUTPUT
+                        Path to output directory. (default ./)
+
+Warning:
+the file name must have the following format {SAMPLE}.{SNP|INDEL}.{something_else}.{xlsx|xls|csv|csv.gz|csv.gzip}
+E.g. 
+A731RV.SNP.FINAL.xlsx
+
+OUTPUT (In case of ‘--directory’ mode):
+
+PHENOA/
+	/SNP/
+		filtered SNP for each sample
+	/INDEL/
+		filtered INDEL for each sample
+PHENOA_INDEL_filtered.csv: Filtered INDELs for all the samples belonging to the PHENOA phenotype;
+PHENOA_SNP_filtered.csv: Filtered SNPs for all the samples belonging to the PHENOA phenotype;
+PHENOA_SNP_shared_eliminated.csv: SNPs shared among samples of the same phenotype, then eliminated from PHENOA_SNP_filtered.csv and stored in this file;
+PHENOA_RECESSIVE.csv: homozygous, putative composite Heterozygous and X-linked variants crossed against OMIM recessive genes list. HET column has the ‘pC-HET’ value indicating the putative composite Heterozygous;
+PHENOA_DOMINANT.csv: heterozygous crossed against OMIM dominant genes list;
+PHENOA_noDOM_noREC.csv: Variants of genes without an OMIM dominant|recessive annotation. HET column has the ‘pC-HET’ value indicating the putative composite Heterozygous ;
+PHENOA_genes4GO.txt: Non redundant list of dominant and recessive genes contained in PHENOA_RECESSIVE.csv and PHENOA_DOMINANT.csv useful for the Gene Ontology analysis;
+
+
+TEST
+You can test the program by using as input esomi_prova directory (in the test directory).
+
+$./script/SNP_indel_filter\
+	-d ./test/esomi_prova\ 
+	-p 6\ 
+	-a ./test/esomi_prova_ds.csv\ 
+	-b ./script/OMIM_30_07_22/\ 
+	-o ./test/esomi_prova_test
+
+You should obtain the same results contained in the esomi_prova_out in the test directory.
+
+
 
 
 ## Getting started
