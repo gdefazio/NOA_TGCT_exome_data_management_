@@ -244,6 +244,9 @@ def multifilter(pathfile: str, outpath: str, phen: str = '_') -> list:
     elif pathfile.endswith('.csv') or pathfile.endswith('.csv.gz') or pathfile.endswith('.csv.gzip'):
         log.append(return_time("%s loading..." % pathfile.split('/')[-1]))
         ID = pd.read_csv(pathfile)
+    elif pathfile.endswith('.tsv') or pathfile.endswith('.tsv.gz') or pathfile.endswith('.tsv.gzip'):
+        log.append(return_time("%s loading..." % pathfile.split('/')[-1]))
+        ID = pd.read_csv(pathfile, sep='\t')
     else:
         raise NotImplementedError('The %s file format is not implemented in this tool.' %
                                   pathfile.split('/')[-1])
