@@ -122,8 +122,6 @@ def parseopts():
     parser.add_argument("-o", "--output", type=str,
                         help="Path to output directory. (default ./)",
                         action="store", required=False, default='./')
-<<<<<<< HEAD
-=======
     parser.add_argument('-v', '--verification',
                         help="It verifies whether each sample in sample sheet has files (SNP, INDEL) in input directory",
                         action='store_true', required=False, default=False)
