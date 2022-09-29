@@ -122,6 +122,12 @@ def parseopts():
     parser.add_argument("-o", "--output", type=str,
                         help="Path to output directory. (default ./)",
                         action="store", required=False, default='./')
+<<<<<<< HEAD
+=======
+    parser.add_argument('-v', '--verification',
+                        help="It verifies whether each sample in sample sheet has files (SNP, INDEL) in input directory",
+                        action='store_true', required=False, default=False)
+>>>>>>> 138965b (Main File)
     argcomplete.autocomplete(parser)
     return parser
 
@@ -233,6 +239,10 @@ def return_time(message: str = '') -> str:
 
 
 def multifilter(pathfile: str, outpath: str, phen: str = '_') -> list:
+<<<<<<< HEAD
+=======
+    # It performs all filters except AF
+>>>>>>> 138965b (Main File)
     log = list()
     if pathfile.endswith('.xlsx') or pathfile.endswith('.xls'):
         log.append(return_time("%s loading..." % pathfile.split('/')[-1]))
@@ -254,6 +264,7 @@ def multifilter(pathfile: str, outpath: str, phen: str = '_') -> list:
     before = ID.shape[0]
     try:
         DP = ID[ID['%s.DP' % sample_name] >= 10]
+<<<<<<< HEAD
     except TypeError as err:
         print(sample_name, err)
     after = DP.shape[0]
@@ -275,6 +286,35 @@ def multifilter(pathfile: str, outpath: str, phen: str = '_') -> list:
     Carriers['gnomAD_exomes_OTH_AF'].replace('.', np.NaN, inplace=True)
     Carriers['gnomAD_exomes_SAS_AF'].replace('.', np.NaN, inplace=True)
     Carriers = Carriers.astype({'gnomAD_exomes_AF': np.float,
+=======
+        after = DP.shape[0]
+        log.append(return_time('[%s %s] The number of variants before filter DP >= 10 is %s. After is %s' %
+                               (sample_name, mode, before, after)))
+        del ID
+    except TypeError as err:
+        print(sample_name, err)
+
+    # TOGLIAMO DI QUI IL FILTRO SU AF PER FARLO DOPO
+    # before = after
+    # DP.drop('AF', axis=1, inplace=True)
+    # AF_count = pd.read_csv(os.path.join(outdir, 'AF_recalculation.csv'))
+    # DP = DP.merge(AF_count, on=['CHROM', 'POS', 'REF', 'ALT'])
+    # Carriers = DP[DP['AF'] <= 0.01]
+    # after = Carriers.shape[0]
+    # log.append(return_time('[%s %s] the number of variants before filter AF <= 0.01 is %s. After is %s' %
+    #       (sample_name, mode, before, after)))
+
+    DP['gnomAD_exomes_AF'].replace('.', np.NaN, inplace=True)
+    DP['gnomAD_exomes_AFR_AF'].replace('.', np.NaN, inplace=True)
+    DP['gnomAD_exomes_AMR_AF'].replace('.', np.NaN, inplace=True)
+    DP['gnomAD_exomes_ASJ_AF'].replace('.', np.NaN, inplace=True)
+    DP['gnomAD_exomes_EAS_AF'].replace('.', np.NaN, inplace=True)
+    DP['gnomAD_exomes_FIN_AF'].replace('.', np.NaN, inplace=True)
+    DP['gnomAD_exomes_NFE_AF'].replace('.', np.NaN, inplace=True)
+    DP['gnomAD_exomes_OTH_AF'].replace('.', np.NaN, inplace=True)
+    DP['gnomAD_exomes_SAS_AF'].replace('.', np.NaN, inplace=True)
+    DP = DP.astype({'gnomAD_exomes_AF': np.float,
+>>>>>>> 138965b (Main File)
                                 'gnomAD_exomes_AFR_AF': np.float,
                                 'gnomAD_exomes_AMR_AF': np.float,
                                 'gnomAD_exomes_ASJ_AF': np.float,
@@ -284,10 +324,18 @@ def multifilter(pathfile: str, outpath: str, phen: str = '_') -> list:
                                 'gnomAD_exomes_OTH_AF': np.float,
                                 'gnomAD_exomes_SAS_AF': np.float},)
     before = after
+<<<<<<< HEAD
     MAF = Carriers[(Carriers['gnomAD_exomes_AF'] <= 0.01) | (Carriers['gnomAD_exomes_AF'].isna())]
     after = MAF.shape[0]
     log.append(return_time('[%s %s] The number of variants before filter MAF <= 0.01 or n.a. is %s. After is %s' %
           (sample_name, mode, before, after)))
+=======
+    MAF = DP[(DP['gnomAD_exomes_AF'] <= 0.01) | (DP['gnomAD_exomes_AF'].isna())]
+    after = MAF.shape[0]
+    log.append(return_time('[%s %s] The number of variants before filter MAF <= 0.01 or n.a. is %s. After is %s' %
+          (sample_name, mode, before, after)))
+    del DP
+>>>>>>> 138965b (Main File)
     before = after
     MAF = MAF[((MAF['gnomAD_exomes_AFR_AF'] <= 0.01) | (MAF['gnomAD_exomes_AFR_AF'].isna())) &
               ((MAF['gnomAD_exomes_AMR_AF'] <= 0.01) | (MAF['gnomAD_exomes_AMR_AF'].isna())) &
@@ -306,7 +354,11 @@ def multifilter(pathfile: str, outpath: str, phen: str = '_') -> list:
     if mode == 'INDEL':
         FS_NFS = MAF['ANNOVAR_refseq_Effect'].apply(lambda x: 'frameshift' in x)
         before = after
+<<<<<<< HEAD
         Coding = MAF[(FS_NFS | EX | SP) & NR ]
+=======
+        Coding = MAF[(FS_NFS | EX | SP) & NR]
+>>>>>>> 138965b (Main File)
         after = Coding.shape[0]
         log.append(return_time('[%s %s] The number of variants before filter coding is %s. After is %s' %
               (sample_name, mode, before, after)))
@@ -314,7 +366,11 @@ def multifilter(pathfile: str, outpath: str, phen: str = '_') -> list:
         NS = MAF['ANNOVAR_refseq_Effect'].apply(lambda x: 'nonsynonymous' in x)
         ST = MAF['ANNOVAR_refseq_Effect'].apply(lambda x: 'stop' in x)
         before = after
+<<<<<<< HEAD
         Coding = MAF[(EX | SP | NS | ST) & NR ]
+=======
+        Coding = MAF[(EX | SP | NS | ST) & NR]
+>>>>>>> 138965b (Main File)
         after = Coding.shape[0]
         log.append(return_time('[%s %s] The number of variants before filter coding is %s. After is %s' %
               (sample_name, mode, before, after)))
@@ -348,12 +404,110 @@ def multifilter(pathfile: str, outpath: str, phen: str = '_') -> list:
     return log
 
 
+<<<<<<< HEAD
+=======
+def read_columns(x):
+    a = pd.read_csv(x, usecols=['CHROM', 'POS', 'REF', 'ALT', 'HET'])
+    # print(a)
+    return a
+
+
+def hom_het_transform(statement: str) -> int:
+    if statement == 'HOM':
+        return 2
+    elif statement == 'HET':
+        return 1
+    elif statement == 'pC-HET':
+        return 1
+    else:
+        raise NotImplementedError("The statement management for %s is not implemented" % statement)
+
+
+def countAF(to_import: list, processes: int) -> pd.DataFrame:
+    # to_import = [os.path.join(directory, el) for el in os.listdir(directory)]
+    with mp.Pool(processes=processes, maxtasksperchild=1) as pl:
+        cbk = pl.map(func=read_columns, iterable=to_import,
+                     chunksize=len(to_import) // processes)
+
+    # print(cbk)
+    max_df = pd.concat(cbk, axis=0)
+    max_df['count'] = max_df['HET'].apply(lambda x: hom_het_transform(x))
+    count = pd.DataFrame(max_df.groupby(['CHROM', 'POS', 'REF', 'ALT'])['count'].sum())
+
+    count.columns = ['count']
+    count.reset_index(drop=False, inplace=True)
+    count['AF'] = count['count'] / (data_sheet.shape[0] * 2)
+    return count
+
+
+def filterAF(outdir: str, cond: str, mode: str, fl: str) -> pd.DataFrame:
+    new = pd.read_csv(pjoin(outdir, cond, mode, fl), index_col=0)
+    before = new.shape[0]
+    new.drop('AF', axis=1, inplace=True)
+    new = new.merge(af_recalc, on=['CHROM', 'POS', 'REF', 'ALT'])
+    new.columns = [el.replace(fl.split('.')[0], 'SAMPLE') for el in new.columns]
+    # print(new.columns)
+    new = new[new['AF'] <= 0.01]
+    after = new.shape[0]
+    new.to_csv(pjoin(outdir, cond, mode, fl))
+    print('[%s %s] Before AF <= 0.01 is %s. After is %s' %
+                (fl.split('_')[0], mode, before, after))
+    return new
+
+
+def samples_verif(samples: pd.Series, directory: str):
+    print('''
+          
+                 *** SAMPLES CHECKER MODULE EXECUTION ***
+          
+          ''')
+    dict_f = dict()
+    for f in sorted(os.listdir(directory)):
+        sample = f.split('.')[0]
+        dict_f.setdefault(sample, list())
+        if 'SNP' in f:
+            dict_f[sample].append(0)
+        elif 'INDEL' in f:
+            dict_f[sample].append(1)
+    c = 0
+    for sample in samples:
+        if sample in dict_f:
+            if (0 in dict_f[sample]) and (1 in dict_f[sample]):
+                pass
+            elif (0 not in dict_f[sample]) and (1 in dict_f[sample]):
+                c += 1
+                print('WARNING: SNP file for %s sample is not in %s directory' % (sample, directory))
+            elif (0 in dict_f[sample]) and (1 not in dict_f[sample]):
+                c += 1
+                print('WARNING: INDEL file for %s sample is not in %s directory' % (sample, directory))
+            elif (0 not in dict_f[sample]) and (1 not in dict_f[sample]):
+                c += 1
+                print('WARNING: SNP and INDEL files for %s sample are not in %s directory or file names do not match standards.'
+                      % (sample, directory))
+            else:
+                raise NotImplementedError('for sample %s' % sample)
+        else:
+            c += 1
+            print('WARNING: SNP and INDEL files for %s sample are not in %s directory' % (sample, directory))
+    if c == 0:
+        print('Samples check is ok. You can launch the analysis without -v option\n')
+    else:
+        print('Samples check is not ok. You should manually check samples and files in directory\n')
+
+
+>>>>>>> 138965b (Main File)
 if __name__ == '__main__':
     print(datetime.datetime.now())
     parser_obj = parseopts()
     args = parser_obj.parse_args()
+<<<<<<< HEAD
     single, directory, processes, aux1, aux2, outdir = \
         args.single, args.directory, args.parallel, args.aux1,args.aux2, args.output
+=======
+    single, directory, processes, aux1, aux2, outdir, verif = \
+        args.single, args.directory, args.parallel, args.aux1,args.aux2, \
+        args.output, args.verification
+>>>>>>> 138965b (Main File)
 
     print("""
     ####################################################################
@@ -361,6 +515,7 @@ if __name__ == '__main__':
     #             code_developers: Defazio,G; Farnetani,G              #
     ####################################################################
     
+<<<<<<< HEAD
     Input directory: %s
     Processes: %s
     Output directory: %s
@@ -458,6 +613,125 @@ if __name__ == '__main__':
             with open(pjoin(outdir,'./%s_genes4GO.txt') % cond, 'wt') as gg:
                 for g in genes:
                     gg.write('%s\n' % g)
+=======
+    """)
+
+    if directory is not None and os.path.exists(directory) and os.path.isdir(directory):
+        data_sheet = pd.read_csv(aux1)
+        if verif:
+            samples_verif(data_sheet.SAMPLE, directory)
+        else:
+            print("""
+            Input directory: %s
+            Processes: %s
+            Output directory: %s
+            _________________
+    
+            """ % (directory, processes, outdir))
+            conds = data_sheet.PHENOTYPE.unique()
+            #silenziato solo per continuare la pipeline
+            try:
+                os.mkdir(outdir)
+                for cond in conds:
+                    os.mkdir(pjoin(outdir, cond))
+                    os.mkdir(pjoin(outdir, cond, 'SNP'))
+                    os.mkdir(pjoin(outdir, cond, 'INDEL'))
+            except FileExistsError:
+                print("The directory %s already exists and contains %s objects" %
+                      (outdir, os.listdir(outdir).__len__()))
+            # print(int(len(os.listdir(directory))/processes))
+            iterable = list()
+            for el in data_sheet.SAMPLE:
+                for f in os.listdir(directory):
+                    if f.split('.')[0] == el:
+                        # print(el, f, data_sheet[data_sheet.SAMPLE == el.split('.')[0]]['PHENOTYPE'].iloc[0])
+                        iterable.append((pjoin(directory, f), outdir, data_sheet[data_sheet.SAMPLE == el.split('.')[0]]['PHENOTYPE'].iloc[0]))
+            try:
+                pl = mp.Pool(processes=processes, maxtasksperchild=1)
+                cbk = pl.starmap(func=multifilter,
+                                 iterable=iterable,
+                                 chunksize=len(iterable)//processes)
+                pl.close()
+                pl.join()
+            except IndexError:
+                for el in os.listdir(directory):
+                    try:
+                        print(data_sheet[data_sheet.SAMPLE == el.split('.')[0]]['PHENOTYPE'].iloc[0])
+                    except IndexError:
+                        print(el)
+                raise Exception
+            for el in cbk:
+                print('\n'.join(el))
+            return_time('AF recalculation START')
+            to_conc4af = list()
+            for cond in conds:
+                for mode in ['SNP', 'INDEL']:
+                    to_concat = list()
+                    for fl in os.listdir(pjoin(outdir, cond, mode)):
+                        to_conc4af.append(pjoin(outdir, cond, mode, fl))
+            af_recalc = countAF(to_conc4af, processes)
+            af_recalc.to_csv(os.path.join(outdir, 'AF_recalculation.csv'))
+            return_time('AF recalculation STOP & AF filtering START')
+            for cond in conds:
+                for mode in ['SNP', 'INDEL']:
+                    # adornd_filterAF = lambda x: filterAF(outdir, cond, mode, x)
+                    with mp.Pool(processes=processes,maxtasksperchild=1) as afpl:
+                        pts = [[outdir, cond, mode, x] for x in os.listdir(pjoin(outdir, cond, mode))]
+                        to_concat = afpl.starmap(func=filterAF,
+                                                 iterable=pts,
+                                                 chunksize= len(pts)//processes)
+                    afpl.close()
+                    afpl.join()
+                    resume_var = pd.concat(to_concat, axis=0)
+                    resume_var.to_csv(pjoin(outdir, "%s_%s_filtered.csv" % (cond, mode)), index=False)
+            return_time('AF filtering STOP')
+            for cond in conds:
+                ctn = pd.concat([pd.read_csv(pjoin(outdir, "%s_%s_filtered.csv" % (cond, 'SNP'))),
+                                 pd.read_csv(pjoin(outdir, "%s_%s_filtered.csv" % (cond, 'INDEL')))],
+                                axis=0)
+                ctn.reset_index(drop=True, inplace=True)
+
+                ctn['gene'] = ctn['ANNOVAR_refseq_Gene_ID'].apply(lambda x: x.split('|')[0])
+                comphet = list()
+                clmns = ['SAMPLE', 'CHROM', 'gene', 'POS', 'REF', 'ALT', 'HET']
+                for el in ctn['SAMPLE'].unique():
+                    sub = ctn[ctn['SAMPLE'] == el]
+                    ct = sub.gene.value_counts()
+                    genes = list(ct[ct > 1].index)
+                    comphet.append(sub[sub.gene.isin(genes)][clmns].sort_values(by='gene'))
+                comp_het = pd.concat(comphet, axis=0)
+                comp_het['HET'] = 'pC-HET'
+                ctn.loc[comp_het.index, 'HET'] = 'pC-HET'
+
+                hom = ctn[ctn['HET'] == 'HOM'][clmns]
+
+                X = ctn[ctn['CHROM'] == 'chrX'][clmns]
+                pre_recessive = pd.concat([comp_het, hom, X], axis=0).drop_duplicates(ignore_index=True)
+
+                path_omim_recessive = pjoin(aux2, 'OMIM_recessive_genes_approved_symbol.pkl')
+                omim_recessive = pd.read_pickle(path_omim_recessive)
+                recessive = pre_recessive[pre_recessive['gene'].isin(omim_recessive.symbol)]
+
+                recessive.to_csv(pjoin(outdir, "%s_RECESSIVE.csv" % cond), index=False)
+
+                dominant = ctn[ctn['HET'] == 'HET'][clmns]
+                path_omim_dominant = pjoin(aux2, 'OMIM_dominant_genes_approved_symbol.pkl')
+                omim_dominant = pd.read_pickle(path_omim_dominant)
+                dominant = dominant[dominant['gene'].isin(omim_dominant.symbol)]
+                dominant = dominant[~dominant.set_index(['SAMPLE', 'gene']).index.isin(
+                    pre_recessive.set_index(['SAMPLE', 'gene']).index)]
+
+                dominant.to_csv(pjoin(outdir, "%s_DOMINANT.csv" % cond), index=False)
+                ctn = ctn[clmns]
+                remaining = ctn[(~ctn.set_index(['SAMPLE','gene','POS']).index.isin(dominant.set_index(
+                    ['SAMPLE','gene','POS']).index)) & (~ctn.set_index(['SAMPLE','gene','POS']).index.isin(
+                    recessive.set_index(['SAMPLE','gene','POS']).index))]
+                remaining.to_csv(pjoin(outdir,'%s_noDOM_noREC.csv' % cond))
+                genes = pd.Series(recessive.gene.to_list() + dominant.gene.to_list()).unique()
+                with open(pjoin(outdir,'./%s_genes4GO.txt') % cond, 'wt') as gg:
+                    for g in genes:
+                        gg.write('%s\n' % g)
+>>>>>>> 138965b (Main File)
 
     elif os.path.exists(single) and os.path.isdir(single) is False:
         multifilter(single, outdir)
