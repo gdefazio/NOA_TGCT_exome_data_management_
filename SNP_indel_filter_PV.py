@@ -265,16 +265,6 @@ def multifilter(pathfile: str, outpath: str, phen: str = '_') -> list:
     except TypeError as err:
         print(sample_name, err)
 
-    # TOGLIAMO DI QUI IL FILTRO SU AF PER FARLO DOPO
-    # before = after
-    # DP.drop('AF', axis=1, inplace=True)
-    # AF_count = pd.read_csv(os.path.join(outdir, 'AF_recalculation.csv'))
-    # DP = DP.merge(AF_count, on=['CHROM', 'POS', 'REF', 'ALT'])
-    # Carriers = DP[DP['AF'] <= 0.01]
-    # after = Carriers.shape[0]
-    # log.append(return_time('[%s %s] the number of variants before filter AF <= 0.01 is %s. After is %s' %
-    #       (sample_name, mode, before, after)))
-
     DP['gnomAD_exomes_AF'].replace('.', np.NaN, inplace=True)
     DP['gnomAD_exomes_AFR_AF'].replace('.', np.NaN, inplace=True)
     DP['gnomAD_exomes_AMR_AF'].replace('.', np.NaN, inplace=True)
