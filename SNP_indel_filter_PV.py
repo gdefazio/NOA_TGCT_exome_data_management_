@@ -516,11 +516,15 @@ if __name__ == '__main__':
             for cond in conds:
                 for mode in ['SNP', 'INDEL']:
                     # adornd_filterAF = lambda x: filterAF(outdir, cond, mode, x)
-                    with mp.Pool(processes=processes,maxtasksperchild=1) as afpl:
-                        pts = [[outdir, cond, mode, x] for x in os.listdir(pjoin(outdir, cond, mode))]
+                    pts = [[outdir, cond, mode, x] for x in os.listdir(pjoin(outdir, cond, mode))]
+                    if len(pts) < processes:
+                        psl = len(pts)
+                    else:
+                        psl = processes
+                    with mp.Pool(processes=psl,maxtasksperchild=1) as afpl:
                         to_concat = afpl.starmap(func=filterAF,
                                                  iterable=pts,
-                                                 chunksize= len(pts)//processes)
+                                                 chunksize= len(pts)//psl)
                     afpl.close()
                     afpl.join()
                     resume_var = pd.concat(to_concat, axis=0)
