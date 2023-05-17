@@ -503,7 +503,7 @@ if __name__ == '__main__':
                 raise Exception
             for el in cbk:
                 print('\n'.join(el))
-            return_time('AF recalculation START')
+            print(return_time('AF recalculation START'))
             to_conc4af = list()
             for cond in conds:
                 for mode in ['SNP', 'INDEL']:
@@ -512,7 +512,7 @@ if __name__ == '__main__':
                         to_conc4af.append(pjoin(outdir, cond, mode, fl))
             af_recalc = countAF(to_conc4af, processes)
             af_recalc.to_csv(os.path.join(outdir, 'AF_recalculation.csv'))
-            return_time('AF recalculation STOP & AF filtering START')
+            print(return_time('AF recalculation STOP & AF filtering START'))
             for cond in conds:
                 for mode in ['SNP', 'INDEL']:
                     # adornd_filterAF = lambda x: filterAF(outdir, cond, mode, x)
@@ -529,7 +529,7 @@ if __name__ == '__main__':
                     afpl.join()
                     resume_var = pd.concat(to_concat, axis=0)
                     resume_var.to_csv(pjoin(outdir, "%s_%s_filtered.csv" % (cond, mode)), index=False)
-            return_time('AF filtering STOP')
+            print(return_time('AF filtering STOP'))
             for cond in conds:
                 ctn = pd.concat([pd.read_csv(pjoin(outdir, "%s_%s_filtered.csv" % (cond, 'SNP'))),
                                  pd.read_csv(pjoin(outdir, "%s_%s_filtered.csv" % (cond, 'INDEL')))],

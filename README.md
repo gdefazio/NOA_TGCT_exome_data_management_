@@ -1,4 +1,4 @@
-# SNP_INDEL_filtering
+# Exome sequencing data management and variant filtering in azoospermic and testicular germ cell tumor patients
 
 This program executes all the passages contained in the Krausz et al. pipeline for SNP and 
 INDEL filtering. It takes in input .xlsx or .csv files obtained after exome sequencing data
