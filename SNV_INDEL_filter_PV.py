@@ -87,10 +87,10 @@ def to_select(sample: str, mode: str) -> list:
                 "MutationAssessor_pred"]
     if mode == 'INDEL':
         return cl2select[:-6]
-    elif mode == 'SNP':
+    elif mode == 'SNV':
         return cl2select
     else:
-        raise ValueError('Name of file %s is not in {sample_name}.{INDEL | SNP}.annotated.xlsx format')
+        raise ValueError('Name of file %s is not in {sample_name}.{INDEL | SNV}.annotated.xlsx format')
 
 
 def parseopts():
@@ -100,7 +100,7 @@ def parseopts():
         prefix_chars="--")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-s", "--single", type=str,
-                        help="Path to a single INDEL or SNP file.",
+                        help="Path to a single INDEL or SNV file.",
                         action="store", required=False)
     group.add_argument("-d", "--directory", type=str,
                         help="Path to directory to elaborate",
@@ -123,7 +123,7 @@ def parseopts():
                         help="Path to output directory. (default ./)",
                         action="store", required=False, default='./')
     parser.add_argument('-v', '--verification',
-                        help="It verifies whether each sample in sample sheet has files (SNP, INDEL) in input directory",
+                        help="It verifies whether each sample in sample sheet has files (SNV, INDEL) in input directory",
                         action='store_true', required=False, default=False)
     argcomplete.autocomplete(parser)
     return parser
@@ -314,7 +314,7 @@ def multifilter(pathfile: str, outpath: str, phen: str = '_') -> list:
         after = Coding.shape[0]
         log.append(return_time('[%s %s] The number of variants before filter coding is %s. After is %s' %
               (sample_name, mode, before, after)))
-    elif mode == 'SNP':
+    elif mode == 'SNV':
         NS = MAF['ANNOVAR_refseq_Effect'].apply(lambda x: 'nonsynonymous' in x)
         ST = MAF['ANNOVAR_refseq_Effect'].apply(lambda x: 'stop' in x)
         before = after
@@ -323,7 +323,7 @@ def multifilter(pathfile: str, outpath: str, phen: str = '_') -> list:
         log.append(return_time('[%s %s] The number of variants before filter coding is %s. After is %s' %
               (sample_name, mode, before, after)))
     else:
-        raise ValueError('Name of file %s is not in {sample_name}.{INDEL | SNP}.annotated.xlsx format')
+        raise ValueError('Name of file %s is not in {sample_name}.{INDEL | SNV}.annotated.xlsx format')
 
     before = after
     Ratio = Coding[Coding[['%s.AD' % sample_name, 'HET']].apply(lambda g: CLA(g), axis=1)]
@@ -335,7 +335,7 @@ def multifilter(pathfile: str, outpath: str, phen: str = '_') -> list:
     else:
         store = pjoin(outpath,'%s.%s.filtered.csv' % (sample_name, mode))
 
-    if mode == 'SNP':
+    if mode == 'SNV':
         Ratio['PIK'] = pathogenic_index(Ratio)
         before = Ratio.shape[0]
         Ratio = Ratio[Ratio['PIK'] >= 0.7]
@@ -411,7 +411,7 @@ def samples_verif(samples: pd.Series, directory: str):
     for f in sorted(os.listdir(directory)):
         sample = f.split('.')[0]
         dict_f.setdefault(sample, list())
-        if 'SNP' in f:
+        if 'SNV' in f:
             dict_f[sample].append(0)
         elif 'INDEL' in f:
             dict_f[sample].append(1)
@@ -422,19 +422,19 @@ def samples_verif(samples: pd.Series, directory: str):
                 pass
             elif (0 not in dict_f[sample]) and (1 in dict_f[sample]):
                 c += 1
-                print('WARNING: SNP file for %s sample is not in %s directory' % (sample, directory))
+                print('WARNING: SNV file for %s sample is not in %s directory' % (sample, directory))
             elif (0 in dict_f[sample]) and (1 not in dict_f[sample]):
                 c += 1
                 print('WARNING: INDEL file for %s sample is not in %s directory' % (sample, directory))
             elif (0 not in dict_f[sample]) and (1 not in dict_f[sample]):
                 c += 1
-                print('WARNING: SNP and INDEL files for %s sample are not in %s directory or file names do not match standards.'
+                print('WARNING: SNV and INDEL files for %s sample are not in %s directory or file names do not match standards.'
                       % (sample, directory))
             else:
                 raise NotImplementedError('for sample %s' % sample)
         else:
             c += 1
-            print('WARNING: SNP and INDEL files for %s sample are not in %s directory' % (sample, directory))
+            print('WARNING: SNV and INDEL files for %s sample are not in %s directory' % (sample, directory))
     if c == 0:
         print('Samples check is ok. You can launch the analysis without -v option\n')
     else:
@@ -451,7 +451,7 @@ if __name__ == '__main__':
 
     print("""
     ####################################################################
-    # SNPs & INDELs filtering tool, resuming Krausz filtering pipeline #
+    # SNVs & INDELs filtering tool, resuming Krausz filtering pipeline #
     #             code_developers: Defazio,G; Farnetani,G              #
     ####################################################################
     
@@ -475,7 +475,7 @@ if __name__ == '__main__':
                 os.mkdir(outdir)
                 for cond in conds:
                     os.mkdir(pjoin(outdir, cond))
-                    os.mkdir(pjoin(outdir, cond, 'SNP'))
+                    os.mkdir(pjoin(outdir, cond, 'SNV'))
                     os.mkdir(pjoin(outdir, cond, 'INDEL'))
             except FileExistsError:
                 print("The directory %s already exists and contains %s objects" %
@@ -506,7 +506,7 @@ if __name__ == '__main__':
             print(return_time('AF recalculation START'))
             to_conc4af = list()
             for cond in conds:
-                for mode in ['SNP', 'INDEL']:
+                for mode in ['SNV', 'INDEL']:
                     to_concat = list()
                     for fl in os.listdir(pjoin(outdir, cond, mode)):
                         to_conc4af.append(pjoin(outdir, cond, mode, fl))
@@ -514,7 +514,7 @@ if __name__ == '__main__':
             af_recalc.to_csv(os.path.join(outdir, 'AF_recalculation.csv'))
             print(return_time('AF recalculation STOP & AF filtering START'))
             for cond in conds:
-                for mode in ['SNP', 'INDEL']:
+                for mode in ['SNV', 'INDEL']:
                     # adornd_filterAF = lambda x: filterAF(outdir, cond, mode, x)
                     pts = [[outdir, cond, mode, x] for x in os.listdir(pjoin(outdir, cond, mode))]
                     if len(pts) < processes:
@@ -531,7 +531,7 @@ if __name__ == '__main__':
                     resume_var.to_csv(pjoin(outdir, "%s_%s_filtered.csv" % (cond, mode)), index=False)
             print(return_time('AF filtering STOP'))
             for cond in conds:
-                ctn = pd.concat([pd.read_csv(pjoin(outdir, "%s_%s_filtered.csv" % (cond, 'SNP'))),
+                ctn = pd.concat([pd.read_csv(pjoin(outdir, "%s_%s_filtered.csv" % (cond, 'SNV'))),
                                  pd.read_csv(pjoin(outdir, "%s_%s_filtered.csv" % (cond, 'INDEL')))],
                                 axis=0)
                 ctn.reset_index(drop=True, inplace=True)
