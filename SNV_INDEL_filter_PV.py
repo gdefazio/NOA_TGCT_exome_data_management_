@@ -455,6 +455,7 @@ def samples_verif(samples: pd.Series, directory: str):
 
 if __name__ == '__main__':
     print(datetime.datetime.now())
+    global pikt, ihaf
     parser_obj = parseopts()
     args = parser_obj.parse_args()
     single, directory, processes, aux1, aux2, outdir, verif, pikt, ihaf = \
@@ -469,7 +470,7 @@ if __name__ == '__main__':
     ####################################################################
     
     """)
-    global pikt, ihaf
+
     if directory is not None and os.path.exists(directory) and os.path.isdir(directory):
         data_sheet = pd.read_csv(aux1)
         if verif:
