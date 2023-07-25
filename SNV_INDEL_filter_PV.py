@@ -119,6 +119,11 @@ def parseopts():
                         help="Auxiliary directory containing OMIM genes classification (e.g. D/r).",
                         action="store", required=("--directory" in sys.argv) or
                                                  ("-d" in sys.argv))
+    parser.add_argument("-pikt", "--pathogenicIndexThreshold", type=int,
+                        help="""Pathogenic Index threshold. 
+                                It retain SNV with an IP >= the user imposed threshold.
+                                If zero, this filter is disabled. (default >= 0.7)""",
+                        action="store", default=0.7, required=False)
     parser.add_argument("-o", "--output", type=str,
                         help="Path to output directory. (default ./)",
                         action="store", required=False, default='./')
@@ -337,11 +342,12 @@ def multifilter(pathfile: str, outpath: str, phen: str = '_') -> list:
 
     if mode == 'SNV':
         Ratio['PIK'] = pathogenic_index(Ratio)
-        before = Ratio.shape[0]
-        Ratio = Ratio[Ratio['PIK'] >= 0.7]
-        after = Ratio.shape[0]
-        log.append(return_time('[%s %s] The number of variants before IPK filter is %s. After is %s' %
-              (sample_name, mode, before, after)))
+        if pikt != 0:
+            before = Ratio.shape[0]
+            Ratio = Ratio[Ratio['PIK'] >= pikt]
+            after = Ratio.shape[0]
+            log.append(return_time('[%s %s] The number of variants before IPK filter is %s. After is %s' %
+                  (sample_name, mode, before, after)))
 
         Ratio.to_csv(store)
         log.append(return_time('[%s %s] Filtered sample stored at %s.' % (sample_name, mode, store)))
@@ -445,9 +451,9 @@ if __name__ == '__main__':
     print(datetime.datetime.now())
     parser_obj = parseopts()
     args = parser_obj.parse_args()
-    single, directory, processes, aux1, aux2, outdir, verif = \
-        args.single, args.directory, args.parallel, args.aux1,args.aux2, \
-        args.output, args.verification
+    single, directory, processes, aux1, aux2, outdir, verif, pikt = \
+        args.single, args.directory, args.parallel, args.aux1, args.aux2, \
+        args.output, args.verification, args.pathogenicIndexThreshold
 
     print("""
     ####################################################################
@@ -456,7 +462,7 @@ if __name__ == '__main__':
     ####################################################################
     
     """)
-
+    global pikt
     if directory is not None and os.path.exists(directory) and os.path.isdir(directory):
         data_sheet = pd.read_csv(aux1)
         if verif:
