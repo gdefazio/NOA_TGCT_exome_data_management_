@@ -36,8 +36,12 @@ Indicate a single file or a directory containing multiple files.
 &emsp; -o OUTPUT, --output OUTPUT &emsp; Path to output directory. (default ./)
 
 &emsp; -pikt --pathogenicIndexThreshold &emsp; Pathogenic Index threshold. 
-                                It retain SNV with an IP >= the user imposed threshold.
-                                If zero, this filter is disabled. (default >= 0.7). (default ./)
+                                It retains SNV with an IP >= the user imposed threshold.
+                                If zero, this filter is disabled. (default >= 0.7).
+
+&emsp; -ihAF --inHouseAlleleFrequency &emsp; In House Allele Frequency Threshold. 
+                                It retains SNV and INDEL with an inHouse AF <= the user imposed threshold.
+                                If one, this filter is DISABLED. (default <= 0.01)
 
 &emsp; -v, --verification &emsp; It verifies whether each sample in sample sheet has files (SNV, INDEL) in input directory
 

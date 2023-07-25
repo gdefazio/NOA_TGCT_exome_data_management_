@@ -119,11 +119,16 @@ def parseopts():
                         help="Auxiliary directory containing OMIM genes classification (e.g. D/r).",
                         action="store", required=("--directory" in sys.argv) or
                                                  ("-d" in sys.argv))
-    parser.add_argument("-pikt", "--pathogenicIndexThreshold", type=int,
+    parser.add_argument("-pikt", "--pathogenicIndexThreshold", type=float,
                         help="""Pathogenic Index threshold. 
-                                It retain SNV with an IP >= the user imposed threshold.
-                                If zero, this filter is disabled. (default >= 0.7)""",
+                                It retains SNV with an IP >= the user imposed threshold.
+                                If zero, this filter is DISABLED. (default >= 0.7)""",
                         action="store", default=0.7, required=False)
+    parser.add_argument("-ihAF", "--inHouseAlleleFrequency", type=float,
+                        help="""In House Allele Frequency Threshold. 
+                                It retains SNV and INDEL with an inHouse AF <= the user imposed threshold.
+                                If one, this filter is DISABLED. (default <= 0.01)""",
+                        action="store", default=0.01, required=False)
     parser.add_argument("-o", "--output", type=str,
                         help="Path to output directory. (default ./)",
                         action="store", required=False, default='./')
@@ -170,7 +175,7 @@ def c234_transform(slot: str) -> float:
     fold: float = 0
     for el in spt:
         if el != '.':
-            score += float32(el)
+            score += float(el)
             fold += 1
     if score == 0 and fold == 0:
         return np.NaN
@@ -399,7 +404,8 @@ def filterAF(outdir: str, cond: str, mode: str, fl: str) -> pd.DataFrame:
     new = new.merge(af_recalc, on=['CHROM', 'POS', 'REF', 'ALT'])
     new.columns = [el.replace(fl.split('.')[0], 'SAMPLE') for el in new.columns]
     # print(new.columns)
-    new = new[new['AF'] <= 0.01]
+    # new = new[new['AF'] <= 0.01]
+    new = new[new['AF'] <= ihaf]
     after = new.shape[0]
     new.to_csv(pjoin(outdir, cond, mode, fl))
     print('[%s %s] Before AF <= 0.01 is %s. After is %s' %
@@ -451,9 +457,10 @@ if __name__ == '__main__':
     print(datetime.datetime.now())
     parser_obj = parseopts()
     args = parser_obj.parse_args()
-    single, directory, processes, aux1, aux2, outdir, verif, pikt = \
+    single, directory, processes, aux1, aux2, outdir, verif, pikt, ihaf = \
         args.single, args.directory, args.parallel, args.aux1, args.aux2, \
-        args.output, args.verification, args.pathogenicIndexThreshold
+        args.output, args.verification, args.pathogenicIndexThreshold, \
+        args.inHouseAlleleFrequency
 
     print("""
     ####################################################################
@@ -462,7 +469,7 @@ if __name__ == '__main__':
     ####################################################################
     
     """)
-    global pikt
+    global pikt, ihaf
     if directory is not None and os.path.exists(directory) and os.path.isdir(directory):
         data_sheet = pd.read_csv(aux1)
         if verif:
