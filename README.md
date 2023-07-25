@@ -35,6 +35,10 @@ Indicate a single file or a directory containing multiple files.
 
 &emsp; -o OUTPUT, --output OUTPUT &emsp; Path to output directory. (default ./)
 
+&emsp; -pikt --pathogenicIndexThreshold &emsp; Pathogenic Index threshold. 
+                                It retain SNV with an IP >= the user imposed threshold.
+                                If zero, this filter is disabled. (default >= 0.7). (default ./)
+
 &emsp; -v, --verification &emsp; It verifies whether each sample in sample sheet has files (SNV, INDEL) in input directory
 
 
@@ -80,6 +84,7 @@ SNV_INDEL_filter_PV.py\
 	-p 20
 	-a ./test/esomi_prova_data_sheet.csv\ 
 	-b ./script/OMIM_30_07_22/\ 
+	-pikt 0.7
 	-o ./test/esomi_prova_test
 ```
 

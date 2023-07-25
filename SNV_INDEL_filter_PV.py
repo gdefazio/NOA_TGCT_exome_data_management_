@@ -161,16 +161,16 @@ def CLA(g) -> bool:
         raise NotImplementedError('il caso in %s non è implementato' % str(g))
 
 
-def c234_transform(slot: str) -> np.float:
+def c234_transform(slot: str) -> float:
     try:
         spt = re.split('\||;', slot)
     except TypeError:
         return float(slot)
-    score: np.float = 0
-    fold: np.float = 0
+    score: float = 0
+    fold: float = 0
     for el in spt:
         if el != '.':
-            score += np.float32(el)
+            score += float32(el)
             fold += 1
     if score == 0 and fold == 0:
         return np.NaN
@@ -178,7 +178,7 @@ def c234_transform(slot: str) -> np.float:
         return score/fold
 
 
-def MutationTaster_transf(slot: str) -> np.float:
+def MutationTaster_transf(slot: str) -> float:
     spt = re.split("\||;", slot)
     l = list(pd.Series(spt).unique())
     if len(l) == 1 and l[0] == '.':
@@ -189,7 +189,7 @@ def MutationTaster_transf(slot: str) -> np.float:
         return 0
 
 
-def MutationAssessor_transf(slot: str) -> np.float:
+def MutationAssessor_transf(slot: str) -> float:
     grading = {'H': 1, 'M': 0.5, 'L': 0.25, 'N': 0}
     spt = re.split("\||;", slot)
     l = [grading[el] for el in list(pd.Series(spt).unique()) if el != '.']
@@ -282,15 +282,15 @@ def multifilter(pathfile: str, outpath: str, phen: str = '_') -> list:
     DP['gnomAD_exomes_NFE_AF'].replace('.', np.NaN, inplace=True)
     DP['gnomAD_exomes_OTH_AF'].replace('.', np.NaN, inplace=True)
     DP['gnomAD_exomes_SAS_AF'].replace('.', np.NaN, inplace=True)
-    DP = DP.astype({'gnomAD_exomes_AF': np.float,
-                                'gnomAD_exomes_AFR_AF': np.float,
-                                'gnomAD_exomes_AMR_AF': np.float,
-                                'gnomAD_exomes_ASJ_AF': np.float,
-                                'gnomAD_exomes_EAS_AF': np.float,
-                                'gnomAD_exomes_FIN_AF': np.float,
-                                'gnomAD_exomes_NFE_AF': np.float,
-                                'gnomAD_exomes_OTH_AF': np.float,
-                                'gnomAD_exomes_SAS_AF': np.float},)
+    DP = DP.astype({'gnomAD_exomes_AF': float,
+                                'gnomAD_exomes_AFR_AF': float,
+                                'gnomAD_exomes_AMR_AF': float,
+                                'gnomAD_exomes_ASJ_AF': float,
+                                'gnomAD_exomes_EAS_AF': float,
+                                'gnomAD_exomes_FIN_AF': float,
+                                'gnomAD_exomes_NFE_AF': float,
+                                'gnomAD_exomes_OTH_AF': float,
+                                'gnomAD_exomes_SAS_AF': float},)
     before = after
     MAF = DP[(DP['gnomAD_exomes_AF'] <= 0.01) | (DP['gnomAD_exomes_AF'].isna())]
     after = MAF.shape[0]
